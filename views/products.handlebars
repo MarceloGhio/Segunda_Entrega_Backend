@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Productos</title>
+</head>
+<body>
+    <h1>Lista de Productos</h1>
+    <ul>
+        {{#each products}}
+            <li>{{this.title}} - {{this.price}} <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button></li>
+        {{/each}}
+    </ul>
+
+    <script>
+        function addToCart(productId) {
+            // Implementar la lógica para agregar el producto al carrito
+            // Puedes usar fetch o axios para enviar la solicitud al servidor
+        }
+    </script>
+</body>
+</html>
