@@ -31,7 +31,7 @@ class CartManager {
 
     updateCartIdCounter() {
         if (this.carts.length > 0) {
-            const maxId = Math.max(...this.carts.map((cart) => cart.id));
+            const maxId = Math.max(...this.carts.map((cart) => parseInt(cart.id)));
             this.cartIdCounter = maxId + 1;
         }
     }
@@ -51,25 +51,34 @@ class CartManager {
         return cartId;
     }
 
-    getCartById(cartId) {
-        const cart = this.carts.find((existingCart) => existingCart.id === cartId);
-        if (!cart) {
-            throw new Error("Carrito no encontrado.");
+    async getCartById(cartId) {
+        try {
+            const cart = await Cart.findById(cartId);
+            if (!cart) {
+                throw new Error("Carrito no encontrado.");
+            }
+            return cart;
+        } catch (error) {
+            throw new Error("Error al obtener el carrito por ID.");
         }
-        return cart;
     }
 
     addProductToCart(cartId, productId, quantity) {
-        const cart = this.getCartById(cartId);
-        const productIndex = cart.products.findIndex((product) => product.id === productId);
+        const cartIndex = this.carts.findIndex((cart) => cart.id === cartId);
 
-        if (productIndex !== -1) {
-            cart.products[productIndex].quantity += quantity;
+        if (cartIndex !== -1) {
+            const productIndex = this.carts[cartIndex].products.findIndex((product) => product.id === productId);
+
+            if (productIndex !== -1) {
+                this.carts[cartIndex].products[productIndex].quantity += quantity;
+            } else {
+                this.carts[cartIndex].products.push({ id: productId, quantity });
+            }
+
+            this.saveCarts();
         } else {
-            cart.products.push({ id: productId, quantity });
+            throw new Error("Carrito no encontrado.");
         }
-
-        this.saveCarts();
     }
 
     generateUniqueId() {
